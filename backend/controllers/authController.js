@@ -3,11 +3,15 @@ const nodemailer = require("nodemailer");
 const crypto = require("crypto");
 
 // Email Transporter Setup
+
+const PASS = process.env.EMAIL_PASSWORD;
+const EMAIL = process.env.EMAIL_ID;
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
-    user: "kumaryatin449@gmail.com",
-    pass: process.env.EMAIL_PASSWORD,
+    user: EMAIL,
+    pass: PASS,
   },
 });
 
@@ -17,7 +21,7 @@ const generateOTP = () => crypto.randomInt(100000, 999999).toString();
 // Register User and Send OTP
 exports.register = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, dob } = req.body;
     let user = await User.findOne({ email });
 
     if (user) return res.status(400).json({ message: "User already exists" });
@@ -25,11 +29,11 @@ exports.register = async (req, res) => {
     const otp = generateOTP();
     const otpExpiry = new Date(Date.now() + 10 * 60 * 1000);
 
-    user = new User({ name, email, password, otp, otpExpiry });
+    user = new User({ name, email, password, dob, otp, otpExpiry });
     await user.save();
 
     await transporter.sendMail({
-      from: "afnantariq715@gmail.com",
+      from: process.env.EMAIL_ID,
       to: email,
       subject: "OTP Verification",
       text: `Your OTP is: ${otp}`,
@@ -84,7 +88,7 @@ exports.resendOTP = async (req, res) => {
     await user.save();
 
     await transporter.sendMail({
-      from: "afnantariq715@gmail.com",
+      from: process.env.EMAIL_ID,
       to: email,
       subject: "Resend OTP Verification",
       text: `Your new OTP is: ${otp}`,
@@ -112,7 +116,12 @@ exports.login = async (req, res) => {
         .json({ message: "Email not verified. Please verify OTP." });
     }
 
-    req.session.user = { id: user._id, email: user.email, name: user.name };
+    req.session.user = {
+      id: user._id,
+      email: user.email,
+      name: user.name,
+      dob: user.dob,
+    };
     res.json({ message: "Login successful" });
   } catch (error) {
     res.status(500).json({ message: "Error logging in", error });
