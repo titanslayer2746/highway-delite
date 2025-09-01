@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import axios from "axios";
+import { BASE_URL } from "../config/api";
 
 interface User {
   name: string;
@@ -50,12 +51,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const checkAuth = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:3000/api/auth/dashboard",
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await axios.get(`${BASE_URL}/api/auth/dashboard`, {
+        withCredentials: true,
+      });
       if (response.status === 200) {
         const data = response.data;
         // Extract user name from the welcome message
@@ -79,7 +77,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   ): Promise<boolean> => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/register",
+        `${BASE_URL}/api/auth/register`,
         { name, email, password, dob },
         {
           withCredentials: true,
@@ -100,7 +98,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const verifyOtp = async (email: string, otp: string): Promise<boolean> => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/verify-otp",
+        `${BASE_URL}/api/auth/verify-otp`,
         { email, otp },
         {
           withCredentials: true,
@@ -121,7 +119,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const resendOtp = async (email: string): Promise<boolean> => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/resend-otp",
+        `${BASE_URL}/api/auth/resend-otp`,
         { email },
         {
           withCredentials: true,
@@ -142,7 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/auth/login",
+        `${BASE_URL}/api/auth/login`,
         { email, password },
         {
           withCredentials: true,
@@ -165,7 +163,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const logout = async (): Promise<void> => {
     try {
       await axios.post(
-        "http://localhost:3000/api/auth/logout",
+        `${BASE_URL}/api/auth/logout`,
         {},
         {
           withCredentials: true,

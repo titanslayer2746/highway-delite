@@ -9,10 +9,13 @@ connectDB();
 
 const app = express();
 
-// CORS configuration to allow localhost:5173
+// CORS configuration to allow localhost:5173 and production frontend
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: [
+      "http://localhost:5173",
+      "https://highway-delite-alpha.vercel.app",
+    ],
     credentials: true,
   })
 );
