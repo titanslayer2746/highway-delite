@@ -2,12 +2,10 @@ const mongoose = require("mongoose");
 const User = require("../models/User"); // Import the User model
 
 const connectDB = async () => {
+  const URL = process.env.MONGO_URI;
   try {
     // Connect to MongoDB
-    await mongoose.connect(MONGO_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    await mongoose.connect(URL);
     console.log("MongoDB Connected Successfully");
     // Create the empty User collection
     await User.createCollection();
@@ -17,7 +15,5 @@ const connectDB = async () => {
     process.exit(1); // Exit the process with failure
   }
 };
-
-connectDB();
 
 module.exports = connectDB;
