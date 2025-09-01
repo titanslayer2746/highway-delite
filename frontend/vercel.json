@@ -1,0 +1,10 @@
+{
+  "vite": {
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/index.html"
+      }
+    ]
+  }
+}
