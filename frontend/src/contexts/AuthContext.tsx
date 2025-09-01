@@ -46,28 +46,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check if user is already authenticated on app start
   useEffect(() => {
-    checkAuth();
-  }, []);
-
-  const checkAuth = async () => {
-    try {
-      const response = await axios.get(`${BASE_URL}/api/auth/dashboard`, {
-        withCredentials: true,
-      });
-      if (response.status === 200) {
-        const data = response.data;
-        // Extract user name from the welcome message
-        const nameMatch = data.message.match(/Welcome to the dashboard, (.+)/);
-        if (nameMatch) {
-          setUser({ name: nameMatch[1], email: "" }); // We don't get email from dashboard endpoint
-        }
+    // Check if user data exists in localStorage or session
+    const userData = localStorage.getItem("user");
+    if (userData) {
+      try {
+        const user = JSON.parse(userData);
+        setUser(user);
+      } catch (error) {
+        console.log("Invalid user data in localStorage");
+        localStorage.removeItem("user");
       }
-    } catch (error) {
-      console.log("Not authenticated");
-    } finally {
-      setLoading(false);
     }
-  };
+    setLoading(false);
+  }, []);
 
   const register = async (
     name: string,
@@ -148,8 +139,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       );
 
       if (response.status === 200) {
-        // After successful login, check auth to get user data
-        await checkAuth();
+        // Store user data in localStorage after successful login
+        const userData = { name: response.data.user?.name || email, email };
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
         return true;
       } else {
         throw new Error(response.data.message || "Login failed");
@@ -173,6 +166,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.error("Logout error:", error);
     } finally {
       setUser(null);
+      localStorage.removeItem("user");
     }
   };
 
